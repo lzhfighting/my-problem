@@ -1,0 +1,70 @@
+#include<iostream>
+#include<cstdio> 
+#include<cstring> 
+using namespace std;
+const int maxn = 5e4 + 5;
+int kind[maxn], par[maxn];
+
+void init()
+{
+	memset(kind, -1, sizeof(kind));
+	for(int i = 0; i < maxn; i++)
+		par[i] = i;	
+}
+
+inline int Find(int x)
+{
+	int root, tmp = x, key = -1;
+	while(x != par[x]){
+		if(kind[x] != -1)
+			key = kind[x];
+		x = par[x];
+	}
+	root = x;
+	x = tmp;
+	while(x != par[x]){
+		kind[x] = key;
+		tmp = par[x];
+		par[x] = root;
+		x = tmp;
+	}
+	kind[x] = key;
+	return root;
+}
+
+int main()
+{
+	init();
+	int n, k, d, x, y, cnt = 0, tx, ty;
+	scanf("%d%d", &n, &k);
+	while(k--)
+	{
+		scanf("%d%d%d", &d, &x, &y);
+		tx = Find(x);
+		ty = Find(y);
+		if(x < 1 || x > n || y < 1 || y > n)
+			cnt++;
+		else if(d == 1){
+			if(tx != ty){
+				if(kind[tx] != -1 && kind[ty] != -1 && kind[tx] != kind[ty])
+					cnt++;
+				else
+					par[ty] = tx;
+			}
+		}
+		else{
+			if(kind[tx] != -1 && kind[ty] != -1){
+				if((kind[tx] + 1) % 3 != kind[ty])
+					cnt++;
+			}
+			else if(kind[tx] != -1)
+				kind[ty] = (kind[tx] + 1) % 3;
+			else if(kind[ty] != -1)
+				kind[tx] = kind[ty] == 0 ? 2 : kind[ty] - 1;
+			else
+				kind[tx] = 1;
+		}
+	}
+	cout << cnt << endl;
+	return 0;
+}
